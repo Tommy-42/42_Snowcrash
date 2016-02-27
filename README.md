@@ -7,8 +7,7 @@
 *Ce projet a pour but de vous faire découvrir, via plusieurs petits challenges, la sécurité
 en informatique dans plusieurs domaines.
 <br>
-Les méthodes que vous allez utiliser, plus ou moins complexes, vous feront voir diffé-
-remment l’informatique en général.
+Les méthodes que vous allez utiliser, plus ou moins complexes, vous feront voir différemment l’informatique en général.
 <br>
 Durant ce projet, vous allez surement rencontrer des difficultés : soyons clairs, ces
 difficultés, il faut que vous les dépassiez de vous-même. Il faut que votre approche des
