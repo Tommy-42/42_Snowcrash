@@ -1,0 +1,28 @@
+# vm OSX => install wireshark
+# open level02.pcap with it and folow tcp stream
+# choose utf-8
+```
+..%..%..&..... ..#..'..$..&..... ..#..'..$.. .....#.....'........... .38400,38400....#.SodaCan:0....'..DISPLAY.SodaCan:0......xterm.........."........!........"..".....b........b....	B.
+..............................1.......!.."......"......!..........."........"..".............	..
+.....................
+Linux 2.6.38-8-generic-pae (::ffff:10.1.1.2) (pts/10)
+
+..wwwbugs login: l.le.ev.ve.el.lX.X
+..
+Password: ft_wandr...NDRel.L0L
+.
+..
+Login incorrect
+wwwbugs login:
+```
+
+# login = l
+# password = ft_wandrNDRelL0L
+
+```
+level02@BornToSec:~$ su flag02
+Password:
+Don't forget to launch getflag !
+flag02@BornToSec:~$ getflag
+Check flag.Here is your token : kooda2puivaav1idi4f57q8iq
+```
