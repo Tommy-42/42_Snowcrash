@@ -1,0 +1,37 @@
+# man find to find the options -user and -group
+# 2>/dev/null to redirect
+# grep -v 'proc' to remove Junk
+find / -user flag00 -group flag00 2>/dev/null | grep -v 'proc'
+
+```
+level00@BornToSec:~$ find / -user flag00 -group flag00 2>/dev/null | grep -v 'proc'
+/bin/...
+/bin/.../flag
+/rofs/bin/...
+/rofs/bin/.../flag
+
+```
+# cat first file ( notice '...' nice try )
+cat /bin/.../flag
+
+```
+level00@BornToSec:~$ cat /bin/.../flag
+Not so fast.. (tips: I came, I saw, I conquered... )
+cdiiddwpgswtgt
+```
+
+# tips => cesar encode ( veni vidi vici )
+# http://www.xarg.org/tools/caesar-cipher/ past cdiiddwpgswtgt and try different key
+# key 11
+cdiiddwpgswtgt => nottoohardhere
+
+# just log as flag00
+```
+su flag00
+password => nottoohardhere
+```
+# get flag
+```
+flag00@BornToSec:~$ getflag
+Check flag.Here is your token : x24ti5gi3x0ol2eh4esiuxias
+```
