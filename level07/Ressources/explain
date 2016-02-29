@@ -1,0 +1,19 @@
+# cat README
+```
+level07@BornToSec:~$ cat README
+*/2 * * * * su -c \"sh /home/user/level07/level07.sh\" - flag07.
+Man crontab
+```
+
+# we can see that there is a cron running every 2 min ( */2 )
+# and excute the script level07 with user flag07
+# lets check it
+```
+level07@BornToSec:~$ cat level07.sh
+#!/bin/sh
+
+for i in /home/user/level07/writable.d/* ; do
+	(ulimit -t 5; bash -x "$i")
+	rm -f "$i"
+done
+```
