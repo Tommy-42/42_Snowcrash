@@ -1,0 +1,70 @@
+# cat README
+```
+level08@BornToSec:~$ cat README
+You don't need to reverse on this level just try to understand how this algo works.
+```
+# lets try
+```
+level08@BornToSec:~$ ./level08
+You need to provied only one arg.
+
+level08@BornToSec:~$ ./level08 aaaa
+abcd
+
+level08@BornToSec:~$ ./level08 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+abcdefghijklmnopqrstuvwxyz{|}~ ...
+```
+# so the programm encrypt the phrase
+# aaaa will be a b c d
+# if we cat token
+```
+f4kmm6p|=(somegarbage)
+```
+# lets write a little script here in cpp
+```
+level08@BornToSec:~$ cat reverse.cpp
+#include <iostream>
+#include <fstream>
+
+char	reverse(char c, int val) {
+
+	int result;
+
+	result = c - val;
+
+	return( (char)result);
+
+}
+
+int		main(int argc, char **argv) {
+
+	std::ifstream	inFile;
+	int				i;
+
+
+	inFile.open("token");
+
+	if( !inFile ) {
+		std::cout << "bad file" << std::endl;
+		exit(1);
+	}
+
+	i = 0;
+	while( inFile.good() ) {
+		std::cout << reverse((char)inFile.get(), i);
+		i++;
+	}
+	std::cout << std::endl;
+
+	return 0;
+}
+```
+# we just need to run the programm
+```
+f3iji1ju5yuevaus41q1afiuq(garbage)
+```
+# just log into flag08
+```
+flag08@BornToSec:~$ getflag
+Check flag.Here is your token : 25749xKZ8L7DkSCwJkT9dyv6f
+```
