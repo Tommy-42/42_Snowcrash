@@ -1,0 +1,90 @@
+# lets cp /bin/getflag into our folder
+# and reverse it
+######################################
+# we need to bypass ptrace because he will block us while reversing the binary
+# lets call objdump -d getflag
+```
+...
+08048946 <main>:
+	...
+	8048989:	e8 b2 fb ff ff       	call   8048540 <ptrace@plt>
+	...
+...
+```
+# just vi -b /tmp/tommy/getflag
+# :%!xxd to open hex mode in vim
+# and lets find the pattern
+```
+e8 b2fb ffff
+```
+# and replace it with some nop to remove the call
+```
+90 9090 9090
+```
+# we just need to save the binary
+```
+:%!xxd -r ( normal mode )
+:wq! ( save )
+```
+# then if we objdump again we will see
+```	
+...
+	8048989:	90                   	nop
+	804898a:	90                   	nop
+	804898b:	90                   	nop
+	804898c:	90                   	nop
+	804898d:	90                   	nop
+...
+```
+
+# then we can start gdb /tmp/tommy/getflag
+# we need to try to reach getuid and the first cmp
+```
+0x08048afd <+439>:	call   0x80484b0 <getuid@plt>
+0x08048b0a <+452>:	cmp    $0xbbe,%eax
+```
+# so lets break now on it
+```
+b *0x08048b0a
+```
+
+# we also need to break on syscall_open to avoid checking
+# security injection
+```
+	...
+	0x08048a51 <+267>:	jne    0x8048e88 <main+1346>
+	0x08048a57 <+273>:	mov    0x804b040,%eax
+	...
+
+b *0x08048a51
+jump *0x08048a57
+```
+
+# we also need to break on fwrite to avoid checking
+# security injection
+```
+	0x08048a7a <+308>:	call   0x80484c0 <fwrite@plt>
+	0x08048a7f <+313>:	mov    $0x1,%eax
+	0x08048a84 <+318>:	jmp    0x8048eb2 <main+1388>
+	0x08048a89 <+323>:	movl   $0x8049063,0x4(%esp)
+b *0x08048a84
+jump *0x08048a89
+```
+
+# we are now on the first CMP after the getuid
+# lets check $eax
+```
+(gdb) p $eax
+$2 = 2014
+```
+
+# lets change it to maybe 3014 ( flag14 ) and continue
+```
+(gdb) set $eax=3014
+(gdb) c
+Continuing.
+Check flag.Here is your token : 7QiHafiNa3HVozsaXkawuYrTstxbpABHD8CPnHJ
+[Inferior 1 (process 29057) exited normally]
+(gdb)
+
+# here you go !
