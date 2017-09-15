@@ -1,25 +1,37 @@
-# cat level09.s
+We can see by login that we have one binary and one token file, we can read the token but it look like it's encrypted
+
+We try to pass some input to the binary
+
 ```
-	.section	.rodata
-.LC0:
-	.string	"%s [file to read]\n"
-.LC1:
-	.string	"token"
-.LC2:
-	.string	"You may not access '%s'\n"
-.LC3:
-	.string	"Unable to open %s"
-.LC4:
-	.string	"Unable to read fd %d"
-	.text
-	.globl	main
-	.type	main, @function
+level09@SnowCrash:~$ ./level09 aaaaa
+abcde
 ```
-# we can deduce that they match word "token" and refuse to open it
-# and in the file there are a lot of 'call	strstr'
-# so lets try to do a symnbolic link in /tmp
+
+We can imediatly see what append, it move the character by it's index in the string so we can build a simple python script that will reverse the encrypted file
+
 ```
-level09@BornToSec:/tmp/tom$ ln -s /home/user/level09/token a
-level09@BornToSec:/tmp/tom$ ~/level09 a
-quif5eloekouj29ke0vouxean
+import sys
+
+for i, val in enumerate(sys.argv[1]):
+	sys.stdout.write(chr(ord(val)-i))
+	sys.stdout.flush()
+print
+
+```
+
+We run it and obtain the token
+
+```
+level09@SnowCrash:~$ python /tmp/script.py `cat token`
+f3iji1ju5yuevaus41q1afiuq
+```
+
+
+now we connect as flag09 and launch getflag
+
+
+```
+Don't forget to launch getflag !
+flag09@SnowCrash:~$ getflag
+Check flag.Here is your token : s5cAJpM8ev6XHw998pRWG728z
 ```

